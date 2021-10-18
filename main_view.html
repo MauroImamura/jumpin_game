@@ -20,10 +20,100 @@
     <body>
         <script>
             //variáveis
-            var canvas, context, game_height, game_width, frames=0;
+            var canvas, context, game_height, game_width, frames=0, jump_limit=3, 
+            
+            ground = {
+                y: 550,
+                height: 50,
+                color: "#aaaaaa",
+
+                draws: function() {
+                    context.fillStyle = this.color;
+                    context.fillRect(0,this.y,game_width,this.height);
+                }
+            },
+            
+            player = {
+                x: 50,
+                y: 0,
+                width: 50,
+                height: 50,
+                color: "#FFF",
+                fall_speed: 0,
+                fall_acceleration: 1,
+                jump_speed: 18,
+                jump_count: 0,
+
+                updates: function() {
+                    this.y += this.fall_speed;
+                    this.fall_speed += this.fall_acceleration;
+                    if (this.y > ground.y - this.height) {
+                        this.y = ground.y - this.height;
+                        this.fall_speed = 0;
+                        this.jump_count = 0;
+                    };
+                },
+
+                jumps: function() {
+                    if (this.jump_count < jump_limit) {
+                        this.fall_speed = -this.jump_speed;
+                        this.jump_count ++;
+                    }
+                },
+
+                draws: function() {
+                    context.fillStyle = this.color;
+                    context.fillRect(this.x,this.y,this.width, this.height);
+                },
+            },
+
+            obstacles = {
+                list: [],
+                colors: ["#888888","#8888CC","#88CC88","#CC8888"],
+                insert_time: 0,
+
+                insert: function() {
+                    this.list.push({
+                        x: game_width,
+                        //x: 200, -> debug
+                        speed: 5 + Math.floor(Math.random()*5),
+                        width: Math.floor(40*(1+Math.random())),
+                        height: Math.floor(50*(1+3*Math.random())),
+                        color: this.colors[Math.floor(4*Math.random())],  
+                    });
+
+                    this.insert_time = 50;
+                },
+
+                updates: function() {
+                    if (this.insert_time == 0) {
+                        this.insert();
+                    }else{
+                        this.insert_time --;
+                    };
+
+                    for (var i = 0, total = this.list.length; i < total; i++){
+                        this.list[i].x -= this.list[i].speed;
+
+                        if (this.list[i].x <= -this.list[i].width){
+                            this.list.splice(i,1)
+                            total --;
+                            i --;
+                        };
+                    }
+                },
+
+                draws: function(){
+                    for (var i = 0, total = this.list.length; i < total; i++){
+                        context.fillStyle = this.list[i].color;
+                        context.fillRect(this.list[i].x, ground.y-this.list[i].height,this.list[i].width,this.list[i].height);
+                    }
+                }
+            };
 
             function clicked(event) {
                 //alert("Clicked!")
+                player.jumps();
             }
 
             function main() {
@@ -55,11 +145,18 @@
 
             function updates() {
                 frames++;
+
+                player.updates();
+                obstacles.updates();
             }
 
             function draws() {
-                context.fillStyle = "#252540"
+                context.fillStyle = "#252540";
                 context.fillRect(0,0,game_width,game_height);
+
+                ground.draws();
+                obstacles.draws();
+                player.draws();
             }
 
             main()
