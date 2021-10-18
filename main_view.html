@@ -1,0 +1,68 @@
+<!doctype HTML>
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+        <title>Jumpin Game</title>
+        <style>
+            body {
+                background-color: rgb(0, 0, 0);
+            }
+            canvas {
+                position: absolute;
+                top: 0px;
+                bottom: 0px;
+                left: 0px;
+                right: 0px;
+                margin: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            //variáveis
+            var canvas, context, game_height, game_width, frames=0;
+
+            function clicked(event) {
+                //alert("Clicked!")
+            }
+
+            function main() {
+                game_height = window.innerHeight;
+                game_width = window.innerWidth;
+
+                if (game_width >= 600) {
+                    game_width = game_height = 600;
+                }
+
+                canvas = document.createElement("canvas");
+                canvas.width = game_width;
+                canvas.height = game_height;
+                canvas.style.border = "1px solid #FFFFFF";
+
+                context = canvas.getContext("2d");
+                document.body.appendChild(canvas);
+                document.addEventListener("mousedown", clicked);
+
+                run()
+            }
+
+            function run() {
+                updates();
+                draws();
+
+                window.requestAnimationFrame(run);
+            }
+
+            function updates() {
+                frames++;
+            }
+
+            function draws() {
+                context.fillStyle = "#252540"
+                context.fillRect(0,0,game_width,game_height);
+            }
+
+            main()
+        </script>
+    </body>
+</html>
