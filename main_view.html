@@ -19,11 +19,17 @@
     </head>
     <body>
         <script>
-            //variáveis
-            var canvas, context, game_height, game_width, frames=0, jump_limit=3, 
+            
+            var canvas, context, game_height=500, game_width, frames=0, jump_limit=3, gravity=1.5, record, current_state,
+            
+            is = {
+                ready: 0,
+                playing: 10,
+                lost: 20
+            }, 
             
             ground = {
-                y: 550,
+                y: game_height-50,
                 height: 50,
                 color: "#aaaaaa",
 
@@ -36,22 +42,28 @@
             player = {
                 x: 50,
                 y: 0,
-                width: 50,
-                height: 50,
+                width: 25,
+                height: 25,
                 color: "#FFF",
                 fall_speed: 0,
-                fall_acceleration: 1,
-                jump_speed: 18,
+                fall_acceleration: gravity,
+                jump_speed: 20,
                 jump_count: 0,
+                score: 0,
 
                 updates: function() {
                     this.y += this.fall_speed;
                     this.fall_speed += this.fall_acceleration;
-                    if (this.y > ground.y - this.height) {
+
+                    if (this.y > ground.y - this.height && current_state != is.lost) {
                         this.y = ground.y - this.height;
                         this.fall_speed = 0;
                         this.jump_count = 0;
-                    };
+                    }
+                    else if (current_state == is.lost && this.y >= 5*game_height) {
+                        this.fall_speed = 0;
+                        this.fall_acceleration = 0;
+                    }
                 },
 
                 jumps: function() {
@@ -59,6 +71,18 @@
                         this.fall_speed = -this.jump_speed;
                         this.jump_count ++;
                     }
+                },
+
+                reset: function() {
+                    this.fall_acceleration = gravity;
+                    player.y = 0;
+                    player.fall_speed = 0;
+                    if (this.score > record) {
+                        localStorage.setItem("record", this.score);
+                        record = this.score
+                    };
+
+                    this.score = 0;
                 },
 
                 draws: function() {
@@ -76,10 +100,11 @@
                     this.list.push({
                         x: game_width,
                         //x: 200, -> debug
-                        speed: 5 + Math.floor(Math.random()*5),
-                        width: Math.floor(40*(1+Math.random())),
-                        height: Math.floor(50*(1+3*Math.random())),
-                        color: this.colors[Math.floor(4*Math.random())],  
+                        speed: 5 + Math.floor(Math.random()*2),
+                        width: 30,
+                        height: Math.floor(50*(1+2*Math.random())),
+                        color: this.colors[Math.floor(4*Math.random())],
+                        scored: false,
                     });
 
                     this.insert_time = 50;
@@ -95,11 +120,18 @@
                     for (var i = 0, total = this.list.length; i < total; i++){
                         this.list[i].x -= this.list[i].speed;
 
-                        if (this.list[i].x <= -this.list[i].width){
+                        if (player.x < this.list[i].x + this.list[i].width && player.x + player.width > this.list[i].x && player.y + player.height > ground.y - this.list[i].height) {
+                            current_state = is.lost;
+                        }
+                        else if (this.list[i].x + this.list[i].width < player.x && this.list[i].scored == false) {
+                            player.score ++;
+                            this.list[i].scored = true;
+                        }
+                        else if (this.list[i].x <= -this.list[i].width){
                             this.list.splice(i,1)
                             total --;
                             i --;
-                        };
+                        }
                     }
                 },
 
@@ -110,20 +142,9 @@
                     }
                 }
             };
-
-            function clicked(event) {
-                //alert("Clicked!")
-                player.jumps();
-            }
-
+            
             function main() {
-                game_height = window.innerHeight;
                 game_width = window.innerWidth;
-
-                if (game_width >= 600) {
-                    game_width = game_height = 600;
-                }
-
                 canvas = document.createElement("canvas");
                 canvas.width = game_width;
                 canvas.height = game_height;
@@ -133,8 +154,32 @@
                 document.body.appendChild(canvas);
                 document.addEventListener("mousedown", clicked);
 
+                current_state = is.ready;
+
+                if (!localStorage.getItem("record")) {
+                    record = 0
+                }
+                else {
+                    record = localStorage.getItem("record");
+                }
                 run()
             }
+
+            function clicked(event) {
+                //alert("Clicked!") -> debug
+                if (current_state == is.playing) {
+                    player.jumps();
+                }
+                else if (current_state == is.ready) {
+                    current_state = is.playing;
+                }
+                else if (current_state == is.lost && player.y >= 3*game_height) {
+                    current_state = is.ready;
+                    obstacles.list = [];
+                    player.reset();
+                }
+            }
+
 
             function run() {
                 updates();
@@ -147,15 +192,56 @@
                 frames++;
 
                 player.updates();
-                obstacles.updates();
+
+                if (current_state == is.playing) {
+                    obstacles.updates();
+                }
             }
 
             function draws() {
                 context.fillStyle = "#252540";
                 context.fillRect(0,0,game_width,game_height);
+                context.fillStyle = "#FFF";
+                context.font = "30px Arial";
+                context.fillText("Score:",game_width/3,30);
+                context.fillText(player.score,game_width/3,70);
+
+                if (current_state == is.ready) {
+                    context.fillStyle = "#00AA00";
+                    context.fillRect(0, game_height/2 - 100, game_width, 100);
+                    context.save();
+                    context.translate(game_width/2, game_height/2 - 50);
+                    context.fillStyle = "#FFF";
+                    context.fillText("JUMPIN GAME", -90, -10);
+                    context.fillText("Clique para começar!", -130, 30);
+                    context.restore();
+                }
+                else if (current_state == is.lost) {
+                    context.fillStyle = "#AA0000";
+                    context.fillRect(0, game_height/2 - 100, game_width, 100);
+                    context.save();
+                    context.translate(game_width/2, game_height/2 - 50);
+                    context.fillStyle = "#FFF";
+
+                    if (player.score > record) {
+                        context.fillText("Você bateu o record!", -110, -10);
+                        context.fillText("Record atual:", -90, 30);
+                        context.fillText(player.score, 120, 30);
+                    } 
+                    else {
+                        context.fillText("Você foi abatido.", -70, -10);
+                        context.fillText("Record atual:", -90, 30);
+                        context.fillText(record, 120, 30);
+                    }
+
+                    context.restore();
+
+                }
+                else{
+                    obstacles.draws();
+                };
 
                 ground.draws();
-                obstacles.draws();
                 player.draws();
             }
 
