@@ -50,6 +50,7 @@
                 jump_speed: 20,
                 jump_count: 0,
                 score: 0,
+                damageable: true,
 
                 updates: function() {
                     this.y += this.fall_speed;
@@ -83,6 +84,7 @@
                     };
 
                     this.score = 0;
+                    shield.current = shield.default;
                 },
 
                 draws: function() {
@@ -120,8 +122,17 @@
                     for (var i = 0, total = this.list.length; i < total; i++){
                         this.list[i].x -= this.list[i].speed;
 
-                        if (player.x < this.list[i].x + this.list[i].width && player.x + player.width > this.list[i].x && player.y + player.height > ground.y - this.list[i].height) {
-                            current_state = is.lost;
+                        if (player.damageable && player.x < this.list[i].x + this.list[i].width && player.x + player.width > this.list[i].x && player.y + player.height > ground.y - this.list[i].height) {
+                            
+                            player.damageable = false;
+                            setTimeout(function(){player.damageable = true;},500)
+                            
+                            if (shield.current == 0) {
+                                current_state = is.lost
+                            }
+                            else {
+                                shield.current --;
+                            }
                         }
                         else if (this.list[i].x + this.list[i].width < player.x && this.list[i].scored == false) {
                             player.score ++;
@@ -141,7 +152,28 @@
                         context.fillRect(this.list[i].x, ground.y-this.list[i].height,this.list[i].width,this.list[i].height);
                     }
                 }
-            };
+            },
+
+            shield = {
+                default: 3,
+                current: 3,
+                width: 15,
+                height: 24,
+                x: window.innerWidth/1.45,
+                gap: 25,
+                y: 47,
+                color: "#00FF00",
+			
+                draws: function(){
+                    context.fillStyle = "#FFF";
+                    context.font = "30px Arial";
+                    context.fillText("Shield:",this.x-5,30);
+                        context.fillStyle = this.color;
+                        for(var i=0; i<this.current; i++){
+                            context.fillRect(this.x + this.gap*i, this.y,this.width,this.height);
+                        }
+                },
+		    };
             
             function main() {
                 game_width = window.innerWidth;
@@ -203,7 +235,7 @@
                 context.fillRect(0,0,game_width,game_height);
                 context.fillStyle = "#FFF";
                 context.font = "30px Arial";
-                context.fillText("Score:",game_width/3,30);
+                context.fillText("Score:",game_width/3-5,30);
                 context.fillText(player.score,game_width/3,70);
 
                 if (current_state == is.ready) {
@@ -241,6 +273,7 @@
                     obstacles.draws();
                 };
 
+                shield.draws()
                 ground.draws();
                 player.draws();
             }
