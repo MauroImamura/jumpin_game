@@ -264,19 +264,20 @@
 
             function clicked(event) {
                 //alert("Clicked!") -> debug
-                if (current_state == is.playing) {
-                    player.jumps();
-                }
-                else if (current_state == is.ready) {
-                    current_state = is.playing;
-                }
-                else if (current_state == is.lost && player.y >= 3*game_height) {
-                    current_state = is.ready;
-                    obstacles.list = [];
-                    player.reset();
+                if (event.clientY <= canvas.getBoundingClientRect(DOMRect).bottom && event.clientY >= canvas.getBoundingClientRect(DOMRect).top) {
+                    if (current_state == is.playing) {
+                        player.jumps();
+                    }
+                    else if (current_state == is.ready) {
+                        current_state = is.playing;
+                    }
+                    else if (current_state == is.lost && player.y >= 3*game_height) {
+                        current_state = is.ready;
+                        obstacles.list = [];
+                        player.reset();
+                    }
                 }
             }
-
 
             function run() {
                 updates();
