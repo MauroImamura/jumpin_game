@@ -20,7 +20,7 @@
     <body>
         <script>
             
-            var canvas, context, game_height=500, game_width, frames=0, jump_limit=3, gravity=1.5, record, current_state,
+            var canvas, context, game_height=500, game_width, frames=0, jump_limit=3, gravity=1.5, record, current_state, base_time_length=70,
             
             is = {
                 ready: 0,
@@ -102,14 +102,14 @@
                     this.list.push({
                         x: game_width,
                         //x: 200, -> debug
-                        speed: 5 + Math.floor(Math.random()*2),
+                        speed: 5 + 2*Math.random(),
                         width: 30,
                         height: Math.floor(50*(1+2*Math.random())),
                         color: this.colors[Math.floor(4*Math.random())],
                         scored: false,
                     });
 
-                    this.insert_time = 50;
+                    this.insert_time = base_time_length;
                 },
 
                 updates: function() {
@@ -170,7 +170,7 @@
                         effect: Math.floor(10*Math.random()),
                     })
 
-                    this.insert_time = 350
+                    this.insert_time = base_time_length*7;
                 },
 
                 updates: function() {
@@ -274,6 +274,7 @@
                     else if (current_state == is.lost && player.y >= 3*game_height) {
                         current_state = is.ready;
                         obstacles.list = [];
+                        bonus.list = [];
                         player.reset();
                     }
                 }
