@@ -1,10 +1,14 @@
 # Jumpin Game
 
-**Outubro de 2021**
+<p align="end">Outubro de 2021</p>
+
+<div align="center">
+  <b>Clique na imagem para jogar:</b>
+
+  <a href="https://mauroimamura.github.io/jumpin_game/"><img src="https://github.com/MauroImamura/images/blob/main/jumpin_game.gif"></a>
+ </div>
 
 ## Descrição
-
-<img src="https://github.com/MauroImamura/images/blob/main/jumpin_game.gif">
 
 Jogo de navegador estilo side-scroller para pular obstáculos e pontuar a cada acerto.
 
