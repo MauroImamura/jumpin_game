@@ -15,3 +15,4 @@ shield_sprite = new Sprite(0,0,30,30),
 bonus_sprite = new Sprite(0, 0, 30, 30);
 title_sprite = new Sprite(0, 0, 1200, 100);
 obstacle_sprite = new Sprite(0, 0, 40, 105);
+jump_sprite = new Sprite(0, 0, 50, 50);

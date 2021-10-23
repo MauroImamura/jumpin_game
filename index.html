@@ -30,6 +30,7 @@
                 extra_shield: new Image(),
                 title_banner: new Image(),
                 obstacle: new Image(),
+                jump_icon: new Image(),
             },
 
             is = {
@@ -278,6 +279,16 @@
                         this.value += 1;
                     }
                 }
+            },
+            
+            jumpin_icons = {
+                position: [100, 160, 220],
+
+                draws: function() {
+                    for(var i=0, total=jump_limit-player.jump_count; i<total; i++) {
+                        jump_sprite.draws(image_set.jump_icon, 0, this.position[i], 35, 50);
+                    }
+                }
             };
             
             function main() {
@@ -306,6 +317,7 @@
                 image_set.extra_shield.src = "images/shield-icon.png";
                 image_set.title_banner.src = "images/ready-screen_banner.png";
                 image_set.obstacle.src = "images/obstacle.png";
+                image_set.jump_icon.src = "images/jump-icon.png";
 
                 run()
             }
@@ -364,9 +376,9 @@
                         context.save();
                         context.translate(game_width/2, game_height/2 - 50);
                         context.fillStyle = "#FFF";
-                        context.fillText("Você bateu o record!", -110, -10);
-                        context.fillText("Record atual:", -90, 30);
-                        context.fillText(player.score, 100, 30);
+                        context.fillText("New Record! Congratulations!", -150, -10);
+                        context.fillText("Current record:", -80, 30);
+                        context.fillText(player.score, 140, 30);
                     } 
                     else {
                         context.fillStyle = "#AA0000";
@@ -374,9 +386,9 @@
                         context.save();
                         context.translate(game_width/2, game_height/2 - 50);
                          context.fillStyle = "#FFF";
-                        context.fillText("Você foi abatido.", -70, -10);
-                        context.fillText("Record atual:", -90, 30);
-                        context.fillText(record, 110, 30);
+                        context.fillText("You were defeated.", -70, -10);
+                        context.fillText("Current record:", -80, 30);
+                        context.fillText(record, 140, 30);
                     }
 
                     context.restore();
@@ -385,10 +397,11 @@
                 else{
                     obstacles.draws();
                     bonus.draws();
+                    jumpin_icons.draws();
                 };
 
                 ground.draws();
-                shield.draws()
+                shield.draws();
                 player.draws();
             }
 
