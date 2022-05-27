@@ -5,7 +5,7 @@
 <div align="center">
   <b>Click on the image bellow to play:</b>
 
-  <a href="https://mauroimamura.github.io/jumpin_game/"><img src="https://github.com/MauroImamura/images/blob/main/jumpin_game.gif"></a>
+  <a href="https://mauroimamura.github.io/jumpin_game/"><img src="https://github.com/MauroImamura/images/blob/main/jumpin_game.gif" target="_blank"></a>
  </div>
 
 ## Description
